@@ -1,17 +1,17 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/database';
+import { DataTypes, Model } from 'sequelize'
+import sequelize from '../config/database'
 
 class Text extends Model {
-  public id!: number;
-  public content!: string;
-  public createdBy!: string;
+  public id!: string // UUID is a string
+  public content!: string
+  public createdBy!: string
 }
 
 Text.init(
   {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     content: {
@@ -29,6 +29,6 @@ Text.init(
     tableName: 'texts',
     timestamps: true,
   }
-);
+)
 
-export default Text;
+export default Text
