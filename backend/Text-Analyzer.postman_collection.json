@@ -1,0 +1,265 @@
+{
+	"info": {
+		"_postman_id": "40e92a39-4bae-4387-8345-81de30080469",
+		"name": "Text-Analyzer",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4519349"
+	},
+	"item": [
+		{
+			"name": "Text CRUD",
+			"item": [
+				{
+					"name": "Create Text",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"content\": \"quick crazy fox jumps over the lazy dog\",\r\n  \"createdBy\": \"John Doe\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/texts",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"texts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Texts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/texts",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"texts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Text By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/texts/60b41cf6-6c10-4148-aa25-7370087ab1cd",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"texts",
+								"60b41cf6-6c10-4148-aa25-7370087ab1cd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Text",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\": \"Another Nice Text\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/texts/10b7c793-61b4-485d-a7d0-27513e38214d",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"texts",
+								"10b7c793-61b4-485d-a7d0-27513e38214d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Text",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/texts/d781289d-54d5-4ee5-a496-8dbd089c6750",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"texts",
+								"d781289d-54d5-4ee5-a496-8dbd089c6750"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Text Analyze",
+			"item": [
+				{
+					"name": "Get No of Words",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/texts/60b41cf6-6c10-4148-aa25-7370087ab1cd/word-count",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"texts",
+								"60b41cf6-6c10-4148-aa25-7370087ab1cd",
+								"word-count"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get No of Chars",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/texts/60b41cf6-6c10-4148-aa25-7370087ab1cd/character-count",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"texts",
+								"60b41cf6-6c10-4148-aa25-7370087ab1cd",
+								"character-count"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get No of Sentences",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/texts/60b41cf6-6c10-4148-aa25-7370087ab1cd/sentence-count",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"texts",
+								"60b41cf6-6c10-4148-aa25-7370087ab1cd",
+								"sentence-count"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get No of Paragraphs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/texts/60b41cf6-6c10-4148-aa25-7370087ab1cd/paragraph-count",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"texts",
+								"60b41cf6-6c10-4148-aa25-7370087ab1cd",
+								"paragraph-count"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Longest Words",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/texts/83a865b5-c9d7-4160-b90c-0f8f7a711af0/longest-words",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"texts",
+								"83a865b5-c9d7-4160-b90c-0f8f7a711af0",
+								"longest-words"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": []
+		}
+	]
+}
