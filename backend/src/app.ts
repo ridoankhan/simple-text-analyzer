@@ -1,7 +1,7 @@
 import express from 'express'
 import * as dotenv from 'dotenv'
 import { initializeDatabase } from './config/database'
-import textRoutes from './routes/routes.middleware'
+import textRoutes from './routes/routes.text'
 
 const app = express()
 

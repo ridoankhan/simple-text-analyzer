@@ -1,27 +1,49 @@
 import Text from '../models/text.model'
 
-// Analyze text content
-export const analyzeText = (text: string) => {
-  const paragraphs = text.split('\n').filter((p) => p.trim() !== '')
-  const sentences = text.split(/[.!?]/).filter((s) => s.trim() !== '')
+// Service to calculate word count
+export const getWordCount = (text: string): number => {
   const words = text.split(/\s+/).filter((w) => w.trim() !== '')
+  return words.length
+}
 
+// Service to calculate character count
+export const getCharacterCount = (text: string): number => {
   const characters = text.replace(/[^\w]|_/g, '')
+  return characters.length
+}
 
-  const longestWords = paragraphs.map((paragraph) => {
+// Service to calculate sentence count
+export const getSentenceCount = (text: string): number => {
+  const sentences = text.split(/[.!?]/).filter((s) => s.trim() !== '')
+  return sentences.length
+}
+
+// Service to calculate paragraph count
+export const getParagraphCount = (text: string): number => {
+  const paragraphs = text.split('\n').filter((p) => p.trim() !== '')
+  return paragraphs.length
+}
+
+// Service to calculate longest words in paragraphs
+export const getLongestWords = (text: string): string[] => {
+  const paragraphs = text.split('\n').filter((p) => p.trim() !== '')
+  return paragraphs.map((paragraph) => {
     const cleaned = paragraph.replace(/[^\w\s]|_/g, '')
     const wordsInParagraph = cleaned.split(/\s+/)
     return wordsInParagraph.reduce((longest, word) => {
       return word.length > longest.length ? word : longest
     }, '')
   })
+}
 
+// Combine all metrics into a single analysis function
+export const analyzeText = (text: string) => {
   return {
-    wordCount: words.length,
-    characterCount: characters.length,
-    sentenceCount: sentences.length,
-    paragraphCount: paragraphs.length,
-    longestWords,
+    wordCount: getWordCount(text),
+    characterCount: getCharacterCount(text),
+    sentenceCount: getSentenceCount(text),
+    paragraphCount: getParagraphCount(text),
+    longestWords: getLongestWords(text),
   }
 }
 

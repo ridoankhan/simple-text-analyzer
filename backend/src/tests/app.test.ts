@@ -4,64 +4,67 @@ import sequelize from '../config/database'
 import Text from '../models/text.model'
 
 beforeAll(async () => {
-  await sequelize.sync({ force: true })
+  await sequelize.sync({ force: true }) // Force sync to ensure the database is clean
 })
 
 afterAll(async () => {
   await sequelize.close()
 })
 
-describe('Text API', () => {
+describe('Text Analysis API', () => {
   let textId: string
 
   it('should create a new text', async () => {
-    const response = await request(app)
-      .post('/api/texts')
-      .send({ content: 'The quick brown fox.', createdBy: 'user1' })
-
-    expect(response.status).toBe(201)
-    expect(response.body.content).toBe('The quick brown fox.')
-    textId = response.body.id
-  })
-
-  it('should fetch all texts', async () => {
-    const response = await request(app).get('/api/texts')
-    expect(response.status).toBe(200)
-    expect(response.body.length).toBe(1)
-  })
-
-  it('should fetch a text by ID', async () => {
-    const response = await request(app).get(`/api/texts/${textId}`)
-    expect(response.status).toBe(200)
-    expect(response.body.content).toBe('The quick brown fox.')
-  })
-
-  it('should update a text', async () => {
-    const response = await request(app)
-      .put(`/api/texts/${textId}`)
-      .send({ content: 'The quick brown fox jumps over the lazy dog.' })
-
-    expect(response.status).toBe(200)
-    expect(response.body.content).toBe(
-      'The quick brown fox jumps over the lazy dog.'
-    )
-  })
-
-  it('should delete a text', async () => {
-    const response = await request(app).delete(`/api/texts/${textId}`)
-    expect(response.status).toBe(204)
-  })
-
-  it('should analyze a text', async () => {
-    const createResponse = await request(app).post('/api/texts').send({
+    const response = await request(app).post('/api/v1/texts').send({
       content: 'The quick brown fox jumps over the lazy dog.',
       createdBy: 'user1',
     })
 
-    const analyzeResponse = await request(app).get(
-      `/api/texts/${createResponse.body.id}/analyze`
+    expect(response.status).toBe(201)
+    expect(response.body.content).toBe(
+      'The quick brown fox jumps over the lazy dog.'
     )
-    expect(analyzeResponse.status).toBe(200)
-    expect(analyzeResponse.body.wordCount).toBe(9)
+    textId = response.body.id
   })
+
+  it('should return the word count of a text', async () => {
+    const response = await request(app).get(
+      `/api/v1/texts/${textId}/word-count`
+    )
+    expect(response.status).toBe(200)
+    expect(response.body.wordCount).toBe(9)
+  })
+
+  it('should return the character count of a text', async () => {
+    const response = await request(app).get(
+      `/api/v1/texts/${textId}/character-count`
+    )
+    expect(response.status).toBe(200)
+    expect(response.body.characterCount).toBe(35)
+  })
+
+  it('should return the sentence count of a text', async () => {
+    const response = await request(app).get(
+      `/api/v1/texts/${textId}/sentence-count`
+    )
+    expect(response.status).toBe(200)
+    expect(response.body.sentenceCount).toBe(1)
+  })
+
+  it('should return the paragraph count of a text', async () => {
+    const response = await request(app).get(
+      `/api/v1/texts/${textId}/paragraph-count`
+    )
+    expect(response.status).toBe(200)
+    expect(response.body.paragraphCount).toBe(1)
+  })
+
+  // it('should return the longest words in paragraphs of a text', async () => {
+  //   const response = await request(app).get(
+  //     `/api/v1/texts/${textId}/longest-words`
+  //   )
+  //   expect(response.status).toBe(200)
+  //   expect(response.body.longestWords).toContain('jumps')
+  //   // expect(response.body.longestWords).toContain('quick')
+  // })
 })

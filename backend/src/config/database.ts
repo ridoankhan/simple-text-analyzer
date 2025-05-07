@@ -16,7 +16,8 @@ export const initializeDatabase = async (): Promise<void> => {
     await sequelize.authenticate()
     console.log('Database connected')
 
-    await sequelize.sync({ force: false })
+    // Force sync the database to create missing tables
+    await sequelize.sync({ force: true })
     console.log('Database synced')
   } catch (err) {
     console.error('Unable to connect to the database:', err)

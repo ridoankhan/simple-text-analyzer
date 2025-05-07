@@ -2,9 +2,11 @@ import { DataTypes, Model } from 'sequelize'
 import sequelize from '../config/database'
 
 class Text extends Model {
-  public id!: string // UUID is a string
+  public id!: string
   public content!: string
   public createdBy!: string
+  public readonly createdAt!: Date
+  public readonly updatedAt!: Date
 }
 
 Text.init(

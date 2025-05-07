@@ -24,4 +24,11 @@ export const idValidation = Joi.object({
   }),
 })
 
+export const analyzeTextValidation = Joi.object({
+  id: Joi.string().uuid().required().messages({
+    'string.empty': 'ID is required.',
+    'string.guid': 'Invalid ID format. Must be a valid UUID.',
+  }),
+})
+
 export const getAllTextsValidation = Joi.object({})
