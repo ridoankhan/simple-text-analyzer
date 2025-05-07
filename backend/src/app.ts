@@ -2,6 +2,7 @@ import express from 'express'
 import * as dotenv from 'dotenv'
 import sequelize from './config/database';
 import Text from './models/text.model';
+import textRoutes from './routes/text.route';
 
 const app = express()
 
@@ -20,6 +21,8 @@ sequelize.sync({ force: false }).then(() => {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use('/api/v1/texts', textRoutes);
 
 app.get('/', (req, res) => {
   res.send('Welcome to the text analyzer API')
