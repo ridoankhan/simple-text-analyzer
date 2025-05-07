@@ -231,6 +231,7 @@ export const getLongestWords = async (
     }
 
     const longestWords = getLongestWordsService(text.content)
+    console.log(longestWords)
     res.status(200).json({ longestWords })
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch longest words', error })
@@ -243,7 +244,6 @@ export const analyzeTextContent = async (
   res: Response
 ): Promise<void> => {
   const { id } = req.params
-
   try {
     const text = await getTextByIdService(id)
     if (!text) {

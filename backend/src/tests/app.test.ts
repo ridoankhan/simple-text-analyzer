@@ -59,12 +59,15 @@ describe('Text Analysis API', () => {
     expect(response.body.paragraphCount).toBe(1)
   })
 
-  // it('should return the longest words in paragraphs of a text', async () => {
-  //   const response = await request(app).get(
-  //     `/api/v1/texts/${textId}/longest-words`
-  //   )
-  //   expect(response.status).toBe(200)
-  //   expect(response.body.longestWords).toContain('jumps')
-  //   // expect(response.body.longestWords).toContain('quick')
-  // })
+  // write the test for the longest words in paragraphs of a text
+  it('should return the longest words in paragraphs of a text', async () => {
+    const response = await request(app).get(
+      `/api/v1/texts/${textId}/longest-words`
+    )
+    console.log(response.body)
+    expect(response.status).toBe(200)
+    expect(response.body.longestWords).toContain('quick')
+    expect(response.body.longestWords).toContain('brown')
+    expect(response.body.longestWords).toContain('jumps')
+  })
 })

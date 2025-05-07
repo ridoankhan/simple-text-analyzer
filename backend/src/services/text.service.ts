@@ -27,13 +27,14 @@ export const getParagraphCount = (text: string): number => {
 // Service to calculate longest words in paragraphs
 export const getLongestWords = (text: string): string[] => {
   const paragraphs = text.split('\n').filter((p) => p.trim() !== '')
-  return paragraphs.map((paragraph) => {
-    const cleaned = paragraph.replace(/[^\w\s]|_/g, '')
-    const wordsInParagraph = cleaned.split(/\s+/)
-    return wordsInParagraph.reduce((longest, word) => {
-      return word.length > longest.length ? word : longest
-    }, '')
-  })
+  return paragraphs
+    .map((paragraph) => {
+      const cleaned = paragraph.replace(/[^\w\s]|_/g, '') // Remove punctuation
+      const wordsInParagraph = cleaned.split(/\s+/) // Split into words
+      const maxLength = Math.max(...wordsInParagraph.map((word) => word.length)) // Find the max word length
+      return wordsInParagraph.filter((word) => word.length === maxLength) // Collect all words with max length
+    })
+    .flat() // Flatten the array to return a single array of longest words
 }
 
 // Combine all metrics into a single analysis function

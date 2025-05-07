@@ -1,4 +1,4 @@
-import { analyzeText } from '../services/text.service'
+import { analyzeText, getLongestWords } from '../services/text.service'
 
 describe('Text Analysis Service', () => {
   const sampleText =
@@ -24,8 +24,11 @@ describe('Text Analysis Service', () => {
     expect(result.paragraphCount).toBe(1)
   })
 
-  // it('should return the longest word in each paragraph', () => {
-  //   const result = analyzeText(sampleText)
-  //   expect(result.longestWords).toEqual(['jumps'])
-  // })
+  it('should return all the longest words in each paragraph', () => {
+    const text = `The quick brown fox jumps over the lazy dog.
+    The lazy dog slept in the sun.`
+
+    const result = getLongestWords(text)
+    expect(result).toEqual(['quick', 'brown', 'jumps', 'slept'])
+  })
 })

@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">39.45% </span>
+                <span class="strong">44.59% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>58/147</span>
+                <span class='fraction'>66/148</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">45.45% </span>
+                <span class="strong">54.54% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>10/22</span>
+                <span class='fraction'>12/22</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">34.81% </span>
+                <span class="strong">40.44% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>47/135</span>
+                <span class='fraction'>55/136</span>
             </div>
         
             
@@ -555,18 +555,19 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -578,7 +579,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -822,21 +822,22 @@ export const getParagraphCount = async (
 }
 &nbsp;
 // API to return the longest words in paragraphs
-export const getLongestWords = <span class="fstat-no" title="function not covered" >async (</span>
+export const getLongestWords = async (
   req: Request,
   res: Response
-): Promise&lt;void&gt; =&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" > {</span></span>
-  const { id } = <span class="cstat-no" title="statement not covered" >req.params</span>
+): Promise&lt;void&gt; =&gt; {
+  const { id } = req.params
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  try {</span>
-    const text = <span class="cstat-no" title="statement not covered" >await getTextByIdService(id)</span>
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!text) {</span>
+  try {
+    const text = await getTextByIdService(id)
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (!text) {
 <span class="cstat-no" title="statement not covered" >      res.status(404).json({ message: 'Text not found' })</span>
 <span class="cstat-no" title="statement not covered" >      return</span>
     }
 &nbsp;
-    const longestWords = <span class="cstat-no" title="statement not covered" >getLongestWordsService(text.content)</span>
-<span class="cstat-no" title="statement not covered" >    res.status(200).json({ longestWords })</span>
+    const longestWords = getLongestWordsService(text.content)
+    console.log(longestWords)
+    res.status(200).json({ longestWords })
   } catch (error) {
 <span class="cstat-no" title="statement not covered" >    res.status(500).json({ message: 'Failed to fetch longest words', error })</span>
   }
@@ -848,7 +849,6 @@ export const analyzeTextContent = <span class="fstat-no" title="function not cov
   res: Response
 ): Promise&lt;void&gt; =&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" > {</span></span>
   const { id } = <span class="cstat-no" title="statement not covered" >req.params</span>
-&nbsp;
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const text = <span class="cstat-no" title="statement not covered" >await getTextByIdService(id)</span>
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!text) {</span>
@@ -880,7 +880,7 @@ export const analyzeTextContent = <span class="fstat-no" title="function not cov
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-07T19:23:34.923Z
+                at 2025-05-07T19:52:51.860Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
