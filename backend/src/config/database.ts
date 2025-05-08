@@ -1,4 +1,5 @@
-import { Sequelize } from 'sequelize'
+import { Sequelize } from 'sequelize';
+import User from '../models/user.model';
 
 const sequelize = new Sequelize(
   process.env.DB_NAME || 'text_analyzer',
@@ -7,22 +8,22 @@ const sequelize = new Sequelize(
   {
     host: process.env.DB_HOST || 'localhost',
     dialect: 'mysql',
-    logging: false, // Disable SQL query logging
+    logging: false,
   }
-)
+);
 
 export const initializeDatabase = async (): Promise<void> => {
   try {
-    await sequelize.authenticate()
-    console.log('Database connected')
+    await sequelize.authenticate();
+    console.log('Database connected');
 
-    // Force sync the database to create missing tables
-    await sequelize.sync({ force: true })
-    console.log('Database synced')
+    // Sync models
+    await sequelize.sync({ force: false });
+    console.log('Database synced');
   } catch (err) {
-    console.error('Unable to connect to the database:', err)
-    process.exit(1) // Exit the process if the database connection fails
+    console.error('Unable to connect to the database:', err);
+    process.exit(1);
   }
-}
+};
 
-export default sequelize
+export default sequelize;
