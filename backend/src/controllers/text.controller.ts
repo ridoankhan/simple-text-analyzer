@@ -11,6 +11,7 @@ import {
   getParagraphCount as getParagraphCountService,
   getLongestWords as getLongestWordsService,
 } from '../services/text.service'
+import { getCache, setCache, delCache } from '../utils/cache'
 
 // Create a new text entry
 export const createText = async (
@@ -33,238 +34,244 @@ export const createText = async (
 
   try {
     const text = await createTextService(content, createdBy)
+    // Invalidate user's texts cache
+    await delCache(`texts:${createdBy}`)
     res.status(201).json(text)
   } catch (error) {
     res.status(500).json({ message: 'Failed to create text', error })
   }
 }
 
-// Get all text entries
+// Get all text entries (cache per user)
 export const getTexts = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const texts = await getAllTexts()
-    res.status(200).json(texts)
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch texts', error })
-  }
+  const userId = req.user.id
+  const cacheKey = `texts:${userId}`
+
+  const cached = await getCache(cacheKey)
+  if (cached) return res.json(cached)
+
+  const texts = await getAllTexts({ where: { createdBy: userId } })
+  await setCache(cacheKey, texts)
+  res.json(texts)
 }
 
-// Get a single text entry by ID
+// Get a single text entry by ID (cache per user and text)
 export const getTextById = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   const { id } = req.params
+  const userId = req.user.id
+  const cacheKey = `text:${userId}:${id}`
 
-  if (!id || typeof id !== 'string') {
-    res.status(400).json({ message: 'Invalid ID format' })
-    return
-  }
+  const cached = await getCache(cacheKey)
+  if (cached) return res.json(cached)
 
-  try {
-    const text = await getTextByIdService(id)
-    if (!text) {
-      res.status(404).json({ message: 'Text not found' })
-      return
-    }
-    res.status(200).json(text)
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch text', error })
-  }
+  const text = await getTextByIdService(id)
+  if (!text || text.createdBy !== userId)
+    return res.status(404).json({ message: 'Not found' })
+
+  await setCache(cacheKey, text)
+  res.json(text)
 }
 
-// Update a text entry
+// Update a text entry and invalidate all related caches
 export const updateText = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   const { id } = req.params
-  const { content } = req.body
+  const userId = req.user.id
+  const text = await getTextByIdService(id)
+  if (!text || text.createdBy !== userId)
+    return res.status(403).json({ message: 'Forbidden' })
 
-  if (!id || typeof id !== 'string') {
-    res.status(400).json({ message: 'Invalid ID format' })
-    return
-  }
-
-  if (typeof content !== 'string') {
-    res.status(400).json({ message: 'Invalid data type for content' })
-    return
-  }
-
-  if (!content) {
-    res.status(400).json({ message: 'Content is required' })
-    return
-  }
-
-  try {
-    const updatedText = await updateTextService(id, content)
-    if (!updatedText) {
-      res.status(404).json({ message: 'Text not found' })
-      return
-    }
-    res.status(200).json(updatedText)
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to update text', error })
-  }
+  const updated = await updateTextService(id, req.body.content)
+  await delCache([
+    `text:${userId}:${id}`,
+    `texts:${userId}`,
+    `analysis:${userId}:${id}`,
+    `wordCount:${userId}:${id}`,
+    `characterCount:${userId}:${id}`,
+    `sentenceCount:${userId}:${id}`,
+    `paragraphCount:${userId}:${id}`,
+    `longestWords:${userId}:${id}`,
+  ])
+  res.json(updated)
 }
 
-// Delete a text entry
+// Delete a text entry and invalidate all related caches
 export const deleteText = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   const { id } = req.params
+  const userId = req.user.id
+  const text = await getTextByIdService(id)
+  if (!text || text.createdBy !== userId)
+    return res.status(403).json({ message: 'Forbidden' })
 
-  if (!id || typeof id !== 'string') {
-    res.status(400).json({ message: 'Invalid ID format' })
-    return
-  }
-
-  try {
-    const deletedText = await deleteTextService(id)
-    if (!deletedText) {
-      res.status(404).json({ message: 'Text not found' })
-      return
-    }
-    res.status(204).send()
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to delete text', error })
-  }
+  await deleteTextService(id)
+  await delCache([
+    `text:${userId}:${id}`,
+    `texts:${userId}`,
+    `analysis:${userId}:${id}`,
+    `wordCount:${userId}:${id}`,
+    `characterCount:${userId}:${id}`,
+    `sentenceCount:${userId}:${id}`,
+    `paragraphCount:${userId}:${id}`,
+    `longestWords:${userId}:${id}`,
+  ])
+  res.status(204).send()
 }
 
-// API to return the number of words
+// API to return the number of words (cache per user and text)
 export const getWordCount = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   const { id } = req.params
+  const userId = req.user.id
+  const cacheKey = `wordCount:${userId}:${id}`
 
-  try {
-    const text = await getTextByIdService(id)
-    if (!text) {
-      res.status(404).json({ message: 'Text not found' })
-      return
-    }
+  const cached = await getCache(cacheKey)
+  if (cached) return res.json({ wordCount: cached })
 
-    const wordCount = getWordCountService(text.content)
-    res.status(200).json({ wordCount })
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch word count', error })
+  const text = await getTextByIdService(id)
+  if (!text || text.createdBy !== userId) {
+    res.status(404).json({ message: 'Text not found' })
+    return
   }
+
+  const wordCount = getWordCountService(text.content)
+  await setCache(cacheKey, wordCount)
+  res.status(200).json({ wordCount })
 }
 
-// API to return the number of characters
+// API to return the number of characters (cache per user and text)
 export const getCharacterCount = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   const { id } = req.params
+  const userId = req.user.id
+  const cacheKey = `characterCount:${userId}:${id}`
 
-  try {
-    const text = await getTextByIdService(id)
-    if (!text) {
-      res.status(404).json({ message: 'Text not found' })
-      return
-    }
+  const cached = await getCache(cacheKey)
+  if (cached) return res.json({ characterCount: cached })
 
-    const characterCount = getCharacterCountService(text.content)
-    res.status(200).json({ characterCount })
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch character count', error })
+  const text = await getTextByIdService(id)
+  if (!text || text.createdBy !== userId) {
+    res.status(404).json({ message: 'Text not found' })
+    return
   }
+
+  const characterCount = getCharacterCountService(text.content)
+  await setCache(cacheKey, characterCount)
+  res.status(200).json({ characterCount })
 }
 
-// API to return the number of sentences
+// API to return the number of sentences (cache per user and text)
 export const getSentenceCount = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   const { id } = req.params
+  const userId = req.user.id
+  const cacheKey = `sentenceCount:${userId}:${id}`
 
-  try {
-    const text = await getTextByIdService(id)
-    if (!text) {
-      res.status(404).json({ message: 'Text not found' })
-      return
-    }
+  const cached = await getCache(cacheKey)
+  if (cached) return res.json({ sentenceCount: cached })
 
-    const sentenceCount = getSentenceCountService(text.content)
-    res.status(200).json({ sentenceCount })
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch sentence count', error })
+  const text = await getTextByIdService(id)
+  if (!text || text.createdBy !== userId) {
+    res.status(404).json({ message: 'Text not found' })
+    return
   }
+
+  const sentenceCount = getSentenceCountService(text.content)
+  await setCache(cacheKey, sentenceCount)
+  res.status(200).json({ sentenceCount })
 }
 
-// API to return the number of paragraphs
+// API to return the number of paragraphs (cache per user and text)
 export const getParagraphCount = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   const { id } = req.params
+  const userId = req.user.id
+  const cacheKey = `paragraphCount:${userId}:${id}`
 
-  try {
-    const text = await getTextByIdService(id)
-    if (!text) {
-      res.status(404).json({ message: 'Text not found' })
-      return
-    }
+  const cached = await getCache(cacheKey)
+  if (cached) return res.json({ paragraphCount: cached })
 
-    const paragraphCount = getParagraphCountService(text.content)
-    res.status(200).json({ paragraphCount })
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch paragraph count', error })
+  const text = await getTextByIdService(id)
+  if (!text || text.createdBy !== userId) {
+    res.status(404).json({ message: 'Text not found' })
+    return
   }
+
+  const paragraphCount = getParagraphCountService(text.content)
+  await setCache(cacheKey, paragraphCount)
+  res.status(200).json({ paragraphCount })
 }
 
-// API to return the longest words in paragraphs
+// API to return the longest words in paragraphs (cache per user and text)
 export const getLongestWords = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   const { id } = req.params
+  const userId = req.user.id
+  const cacheKey = `longestWords:${userId}:${id}`
 
-  try {
-    const text = await getTextByIdService(id)
-    if (!text) {
-      res.status(404).json({ message: 'Text not found' })
-      return
-    }
+  const cached = await getCache(cacheKey)
+  if (cached) return res.json({ longestWords: cached })
 
-    const longestWords = getLongestWordsService(text.content)
-    console.log(longestWords)
-    res.status(200).json({ longestWords })
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch longest words', error })
+  const text = await getTextByIdService(id)
+  if (!text || text.createdBy !== userId) {
+    res.status(404).json({ message: 'Text not found' })
+    return
   }
+
+  const longestWords = getLongestWordsService(text.content)
+  await setCache(cacheKey, longestWords)
+  res.status(200).json({ longestWords })
 }
 
-// Analyze text content and return all metrics
+// Analyze text content and return all metrics (cache per user and text)
 export const analyzeTextContent = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   const { id } = req.params
-  try {
-    const text = await getTextByIdService(id)
-    if (!text) {
-      res.status(404).json({ message: 'Text not found' })
-      return
-    }
+  const userId = req.user.id
+  const cacheKey = `analysis:${userId}:${id}`
 
-    const wordCount = getWordCountService(text.content)
-    const characterCount = getCharacterCountService(text.content)
-    const sentenceCount = getSentenceCountService(text.content)
-    const paragraphCount = getParagraphCountService(text.content)
-    const longestWords = getLongestWordsService(text.content)
+  const cached = await getCache(cacheKey)
+  if (cached) return res.json(cached)
 
-    res.status(200).json({
-      wordCount,
-      characterCount,
-      sentenceCount,
-      paragraphCount,
-      longestWords,
-    })
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to analyze text', error })
+  const text = await getTextByIdService(id)
+  if (!text || text.createdBy !== userId) {
+    res.status(404).json({ message: 'Text not found' })
+    return
   }
+
+  const wordCount = getWordCountService(text.content)
+  const characterCount = getCharacterCountService(text.content)
+  const sentenceCount = getSentenceCountService(text.content)
+  const paragraphCount = getParagraphCountService(text.content)
+  const longestWords = getLongestWordsService(text.content)
+
+  const result = {
+    wordCount,
+    characterCount,
+    sentenceCount,
+    paragraphCount,
+    longestWords,
+  }
+
+  await setCache(cacheKey, result)
+  res.status(200).json(result)
 }

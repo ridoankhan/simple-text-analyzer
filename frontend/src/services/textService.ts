@@ -1,50 +1,51 @@
-import axios from 'axios';
+import api from './api';
+import { Text, TextAnalysis } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL || '';
-
-interface Text {
-  id: string;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
+class TextService {
+  async getAllTexts(): Promise<Text[]> {
+    return api.get<Text[]>('/texts');
+  }
+  
+  async getTextById(id: string): Promise<Text> {
+    return api.get<Text>(`/texts/${id}`);
+  }
+  
+  async createText(content: string, createdBy: string): Promise<Text> {
+    return api.post<Text>('/texts', { content, createdBy });
+  }
+  
+  async updateText(id: string, content: string): Promise<Text> {
+    return api.put<Text>(`/texts/${id}`, { content });
+  }
+  
+  async deleteText(id: string): Promise<void> {
+    await api.delete<void>(`/texts/${id}`);
+  }
+  
+  // Analysis methods
+  async analyzeText(id: string): Promise<TextAnalysis> {
+    return api.get<TextAnalysis>(`/texts/${id}/analyze`);
+  }
+  
+  async getWordCount(id: string): Promise<{ count: number }> {
+    return api.get<{ count: number }>(`/texts/${id}/word-count`);
+  }
+  
+  async getCharacterCount(id: string): Promise<{ count: number }> {
+    return api.get<{ count: number }>(`/texts/${id}/character-count`);
+  }
+  
+  async getSentenceCount(id: string): Promise<{ count: number }> {
+    return api.get<{ count: number }>(`/texts/${id}/sentence-count`);
+  }
+  
+  async getParagraphCount(id: string): Promise<{ count: number }> {
+    return api.get<{ count: number }>(`/texts/${id}/paragraph-count`);
+  }
+  
+  async getLongestWords(id: string): Promise<{ words: string[] }> {
+    return api.get<{ words: string[] }>(`/texts/${id}/longest-words`);
+  }
 }
 
-export const textService = {
-  async getAllTexts(): Promise<Text[]> {
-    const response = await axios.get(`${API_URL}/api/v1/texts`, {
-      withCredentials: true
-    });
-    return response.data;
-  },
-
-  async getTextById(id: string): Promise<Text> {
-    const response = await axios.get(`${API_URL}/api/v1/texts/${id}`, {
-      withCredentials: true
-    });
-    return response.data;
-  },
-
-  async createText(content: string): Promise<Text> {
-    const response = await axios.post(
-      `${API_URL}/api/v1/texts`,
-      { content },
-      { withCredentials: true }
-    );
-    return response.data;
-  },
-
-  async updateText(id: string, content: string): Promise<Text> {
-    const response = await axios.put(
-      `${API_URL}/api/v1/texts/${id}`,
-      { content },
-      { withCredentials: true }
-    );
-    return response.data;
-  },
-
-  async deleteText(id: string): Promise<void> {
-    await axios.delete(`${API_URL}/api/v1/texts/${id}`, {
-      withCredentials: true
-    });
-  }
-};
+export default new TextService();

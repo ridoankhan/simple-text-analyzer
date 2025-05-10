@@ -1,14 +1,13 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/database';
+import { DataTypes, Model } from 'sequelize'
+import sequelize from '../config/database'
 
 class User extends Model {
-  public id!: string;
-  public googleId!: string;
-  public displayName!: string;
-  public email!: string;
-  public photo!: string;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public id!: string
+  public googleId!: string
+  public displayName!: string
+  public email!: string
+  public photo!: string
+  public jwtToken?: string // Add jwtToken as an optional property
 }
 
 User.init(
@@ -21,7 +20,6 @@ User.init(
     googleId: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
     },
     displayName: {
       type: DataTypes.STRING,
@@ -30,7 +28,6 @@ User.init(
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
     },
     photo: {
       type: DataTypes.STRING,
@@ -42,6 +39,6 @@ User.init(
     tableName: 'users',
     timestamps: true,
   }
-);
+)
 
-export default User;
+export default User

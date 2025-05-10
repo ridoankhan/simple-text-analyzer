@@ -25,9 +25,24 @@ import { isAuthenticated } from '../middlewares/auth.middleware'
 const router = express.Router()
 
 // CRUD routes
-router.post('/', validate(createTextValidation, 'body'), isAuthenticated, createText)
-router.get('/', validate(getAllTextsValidation, 'body'), isAuthenticated, getTexts)
-router.get('/:id', validate(idValidation, 'params'), isAuthenticated, getTextById)
+router.post(
+  '/',
+  validate(createTextValidation, 'body'),
+  isAuthenticated,
+  createText
+)
+router.get(
+  '/',
+  validate(getAllTextsValidation, 'body'),
+  isAuthenticated,
+  getTexts
+)
+router.get(
+  '/:id',
+  validate(idValidation, 'params'),
+  isAuthenticated,
+  getTextById
+)
 router.put(
   '/:id',
   validate(idValidation, 'params'),
@@ -35,7 +50,12 @@ router.put(
   isAuthenticated,
   updateText
 )
-router.delete('/:id', validate(idValidation, 'params'), isAuthenticated, deleteText)
+router.delete(
+  '/:id',
+  validate(idValidation, 'params'),
+  isAuthenticated,
+  deleteText
+)
 
 // Text analysis routes
 router.get(

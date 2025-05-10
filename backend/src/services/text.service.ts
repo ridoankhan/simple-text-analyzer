@@ -54,8 +54,13 @@ export const createText = async (content: string, createdBy: string) => {
 }
 
 // Get all text entries
-export const getAllTexts = async () => {
-  return await Text.findAll()
+export const getAllTexts = async (userId: any) => {
+  return await Text.findAll({
+    where: {
+      createdBy: userId,
+    },
+    order: [['createdAt', 'DESC']],
+  })
 }
 
 // Get a single text entry by ID

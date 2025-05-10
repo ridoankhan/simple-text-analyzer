@@ -1,5 +1,6 @@
-import { Sequelize } from 'sequelize';
-import User from '../models/user.model';
+import { Sequelize } from 'sequelize'
+import dotenv from 'dotenv'
+dotenv.config()
 
 const sequelize = new Sequelize(
   process.env.DB_NAME || 'text_analyzer',
@@ -10,20 +11,30 @@ const sequelize = new Sequelize(
     dialect: 'mysql',
     logging: false,
   }
-);
+)
 
-export const initializeDatabase = async (): Promise<void> => {
+export const initializeDatabase = async (): Promise<any> => {
   try {
-    await sequelize.authenticate();
-    console.log('Database connected');
+    await sequelize.authenticate()
+    console.log('Database connected')
 
-    // Sync models
-    await sequelize.sync({ force: false });
-    console.log('Database synced');
+    // Sync models here if needed
+    console.log('Database synced')
   } catch (err) {
-    console.error('Unable to connect to the database:', err);
-    process.exit(1);
+    console.error('Unable to connect to the database:', err)
+    process.exit(1)
   }
-};
+}
 
-export default sequelize;
+const syncDatabase = async () => {
+  try {
+    await sequelize.sync({ alter: true }) // Use `alter: true` to update the schema
+    console.log('Database synced')
+  } catch (error) {
+    console.error('Error syncing database:', error)
+  }
+}
+
+syncDatabase()
+
+export default sequelize

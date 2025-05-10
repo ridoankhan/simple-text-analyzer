@@ -1,80 +1,54 @@
-import React, { useEffect } from 'react';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
-import { useAuth } from './contexts/AuthContext';
+import React, { useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { AuthProvider } from './contexts/AuthContext'
+import LoginPage from './pages/LoginPage'
+import DashboardPage from './pages/DashboardPage'
+import TextAnalysisPage from './pages/TextAnalysisPage'
+import ErrorPage from './pages/ErrorPage'
+import ProtectedRoute from './components/ProtectedRoute'
+import authService from './services/authService'
+import CallbackPage from './pages/CallbackPage'
 
-// Pages
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import TextAnalysis from './pages/TextAnalysis';
-import NotFound from './pages/NotFound';
-
-// Components
-import Layout from './components/layout/Layout';
-import ProtectedRoute from './components/auth/ProtectedRoute';
-import LoadingScreen from './components/ui/LoadingScreen';
-
-function App() {
-  const { isAuthenticated, isLoading, checkAuthStatus } = useAuth();
-  const navigate = useNavigate();
-
+const App: React.FC = () => {
   useEffect(() => {
-    checkAuthStatus();
-  }, [checkAuthStatus]);
+    const url = new URL(window.location.href)
+    console.log('Full URL:', url.href)
+    const params = new URLSearchParams(url.search)
+    console.log('Search Params:', params.toString())
+    const token = params.get('token')
+    console.log('Extracted Token:', token)
 
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
+    if (token) {
+      authService.setToken(token)
+      console.log('Token stored successfully')
+
+      window.history.replaceState(null, '', '/dashboard')
+    }
+  }, [])
 
   return (
-    <>
-      <Routes>
-        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} />
-        
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Navigate to="/dashboard" replace />} />
-          
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/analysis/:id" element={
-            <ProtectedRoute>
-              <TextAnalysis />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
-      
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            borderRadius: '8px',
-            background: '#333',
-            color: '#fff',
-          },
-          success: {
-            iconTheme: {
-              primary: '#10B981',
-              secondary: 'white',
-            },
-          },
-          error: {
-            iconTheme: {
-              primary: '#EF4444',
-              secondary: 'white',
-            },
-          },
-        }}
-      />
-    </>
-  );
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path='/login' element={<LoginPage />} />
+
+          {/* Protected routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path='/dashboard' element={<DashboardPage />} />
+            <Route path='/callback' element={<CallbackPage />} />
+            <Route path='/texts/:id/analyze' element={<TextAnalysisPage />} />
+          </Route>
+
+          {/* Redirect root to dashboard or login */}
+          <Route path='/' element={<Navigate to='/dashboard' replace />} />
+
+          {/* Error routes */}
+          <Route path='/error' element={<ErrorPage />} />
+          <Route path='*' element={<ErrorPage />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  )
 }
 
-export default App;
+export default App

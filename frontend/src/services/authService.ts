@@ -1,33 +1,31 @@
-import axios from 'axios';
+import api from './api'
+import { AuthResponse, User } from '../types'
 
-const API_URL = import.meta.env.VITE_API_URL || '';
-
-export interface AuthResponse {
-  authenticated: boolean;
-  user?: {
-    id: string;
-    name: string;
-    email: string;
-    picture?: string;
-  };
-}
-
-export const authService = {
+class AuthService {
   async getAuthStatus(): Promise<AuthResponse> {
-    try {
-      const response = await axios.get(`${API_URL}/api/v1/auth/status`, {
-        withCredentials: true
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Error checking auth status:', error);
-      return { authenticated: false };
-    }
-  },
+    return api.get<AuthResponse>('/auth/status')
+  }
 
   async logout(): Promise<void> {
-    await axios.get(`${API_URL}/api/v1/auth/logout`, {
-      withCredentials: true
-    });
+    try {
+      await api.get('/auth/logout')
+    } finally {
+      localStorage.removeItem('token')
+    }
   }
-};
+
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem('token')
+  }
+
+  setToken(token: string): void {
+    console.log('Storing token:', token)
+    localStorage.setItem('token', token)
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('token')
+  }
+}
+
+export default new AuthService()
